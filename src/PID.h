@@ -12,7 +12,7 @@ public:
 
   /*
   * Coefficients
-  */ 
+  */
   double Kp;
   double Ki;
   double Kd;
@@ -41,6 +41,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * Convenience function for adding dp amount to a PID controller parameter based on index
+  */
+  void AddToDpAtIndex(int index, double amount);
 };
 
 #endif /* PID_H */
