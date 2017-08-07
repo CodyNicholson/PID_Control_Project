@@ -4,10 +4,6 @@
 
 using namespace std;
 
-/*
-* TODO: Complete the PID class.
-*/
-
 PID::PID() {}
 
 PID::~PID() {}
@@ -18,66 +14,60 @@ void PID::Init(double Kp, double Ki, double Kd) {
     PID::Kd = Kd;
     p_error = d_error = i_error = 0.0;
 
-    // Twiddling parameters
-    yes_i_wanna_twiddle = false;
+    // Twiddle params
+    use_twiddle = false;
     dp = {0.1*Kp,0.1*Kd,0.1*Ki};
     step = 1;
-    param_index = 2;  // this will wrao back to 0 after the first twiddle loop
-    n_settle_steps = 100;
-    n_eval_steps = 2000;
+    param_index = 2;
+    settle_steps = 100;
+    eval_steps = 2000;
     total_error = 0;
     best_error = std::numeric_limits<double>::max();
-    tried_adding = false;
-    tried_subtracting = false;
+    try_add = false;
+    try_subtract = false;
 }
 
 void PID::UpdateError(double cte) {
     if (step == 1) {
-        // to get correct initial d_error
+        // Get correct initial d_error
         p_error = cte;
     }
     d_error = cte - p_error;
     p_error = cte;
     i_error += cte;
 
-    // update total error only if we're past number of settle steps
-    if (step % (n_settle_steps + n_eval_steps) > n_settle_steps){
+    // Update total error if past number settle steps
+    if (step % (settle_steps + eval_steps) > settle_steps){
         total_error += pow(cte,2);
     }
 
-    // last step in twiddle loop... twiddle it?
-    if (yes_i_wanna_twiddle && step % (n_settle_steps + n_eval_steps) == 0){
+    // Should we use twiddle?
+    if (use_twiddle && step % (settle_steps + eval_steps) == 0){
         cout << "step: " << step << endl;
         cout << "total error: " << total_error << endl;
         cout << "best error: " << best_error << endl;
         if (total_error < best_error) {
             cout << "improvement!" << endl;
             best_error = total_error;
-            if (step !=  n_settle_steps + n_eval_steps) {
-                // don't do this if it's the first time through
+            if (step !=  settle_steps + eval_steps) {
                 dp[param_index] *= 1.1;
             }
-            // next parameter
             param_index = (param_index + 1) % 3;
-            tried_adding = tried_subtracting = false;
+            try_add = try_subtract = false;
         }
-        if (!tried_adding && !tried_subtracting) {
-            // try adding dp[i] to params[i]
+        if (!try_add && !try_subtract) {
             AddToParameterAtIndex(param_index, dp[param_index]);
-            tried_adding = true;
+            try_add = true;
         }
-        else if (tried_adding && !tried_subtracting) {
-            // try subtracting dp[i] from params[i]
+        else if (try_add && !try_subtract) {
             AddToParameterAtIndex(param_index, -2 * dp[param_index]);
-            tried_subtracting = true;
+            try_subtract = true;
         }
         else {
-            // set it back, reduce dp[i], move on to next parameter
             AddToParameterAtIndex(param_index, dp[param_index]);
             dp[param_index] *= 0.9;
-            // next parameter
             param_index = (param_index + 1) % 3;
-            tried_adding = tried_subtracting = false;
+            try_add = try_subtract = false;
         }
         total_error = 0;
         cout << "new parameters" << endl;

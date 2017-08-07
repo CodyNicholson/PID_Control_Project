@@ -18,6 +18,20 @@ public:
   double Kd;
 
   /*
+  * Twiddle variables
+  */
+  std::vector<double> dp;
+  int step;
+  int param_index;
+  int settle_steps;
+  int eval_steps;
+  double total_error;
+  double best_error;
+  bool try_add;
+  bool try_subtract;
+  bool use_twiddle;
+
+  /*
   * Constructor
   */
   PID();
