@@ -39,9 +39,9 @@ int main()
 
   // TODO: Initialize the pid variable.
   pid_steer.Init(0.134611, 0.000270736, 3.05349);
-  pid_t.Init(0.316731, 0.0000, 0.0226185);
+  pid_throttle.Init(0.316731, 0.0000, 0.0226185);
 
-  h.onMessage([&pid_steer, &pid_hrottlet](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pid_steer, &pid_throttle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -54,8 +54,6 @@ int main()
         if (event == "telemetry") {
           // j[1] is the data JSON object
           double cte = std::stod(j[1]["cte"].get<std::string>());
-          double speed = std::stod(j[1]["speed"].get<std::string>());
-          double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
           double throttle_value;
           /*
@@ -66,12 +64,12 @@ int main()
           */
 
           // Calculate steer_value at each step & update error
-          pid_steer.UpdatehrottleError(cte);
-          steer_value = - pid_steer.Kp * phrottleid_steer.p_errohrottler - pid_steer.Kd * phrottleid_steer.d_errohrottler - pid_steer.Ki * phrottleid_steer.i_errohrottler;
+          pid_steer.UpdateError(cte);
+          steer_value = - pid_steer.Kp * pid_steer.p_error - pid_steer.Kd * pid_steer.d_error - pid_steer.Ki * pid_steer.i_error;
 
           // Calculate throttle_value at each step & update error
-          pid_t.UpdateError(fabs(cte));
-          throttle_value = 0.75 - pid_t.Kp * pid_t.p_error - pid_t.Kd * pid_t.d_error - pid_t.Ki * pid_t.i_error;
+          pid_throttle.UpdateError(fabs(cte));
+          throttle_value = 0.75 - pid_throttle.Kp * pid_throttle.p_error - pid_throttle.Kd * pid_throttle.d_error - pid_throttle.Ki * pid_throttle.i_error;
 
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << steer_value << " Throttle Value: " << //throttle_value << std::endl;
