@@ -65,11 +65,11 @@ int main()
 
           // Calculate steer_value at each step & update error
           pid_steer.UpdateError(cte);
-          steer_value = - pid_steer.Kp * pid_steer.p_error - pid_steer.Kd * pid_steer.d_error - pid_steer.Ki * pid_steer.i_error;
+          steer_value = pid_steer.TotalError();
 
           // Calculate throttle_value at each step & update error
           pid_throttle.UpdateError(fabs(cte));
-          throttle_value = 0.75 - pid_throttle.Kp * pid_throttle.p_error - pid_throttle.Kd * pid_throttle.d_error - pid_throttle.Ki * pid_throttle.i_error;
+          throttle_value = 0.75 + pid_throttle.TotalError();
 
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << steer_value << " Throttle Value: " << //throttle_value << std::endl;

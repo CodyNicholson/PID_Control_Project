@@ -78,7 +78,7 @@ void PID::UpdateError(double cte) {
 }
 
 double PID::TotalError() {
-    return 0.0;  // ?
+    return -Kp * p_error - Kd * d_error - Ki * i_error;
 }
 
 void PID::AddToDpAtIndex(int index, double amount) {

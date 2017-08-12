@@ -8,7 +8,7 @@ In this project I created a PID controller to handle the self-driving car's thre
 
 ##### Describe the effect each of the P, I, D components had in your implementation
 
-**P** component stands for *proportional*. Using the **P** component, the car will always steer proportional to the car's distance from the center of the lane (denoted **cte**).
+**P** component stands for *proportional*. Using the **P** component, the car's steering change will always be proportional to the car's distance from the center of the lane (denoted **cte**).
 
 **I** stands for *integral*. The **I** component helps offset the bias in the CTE that can be caused by steering drift when the car turns.
 
